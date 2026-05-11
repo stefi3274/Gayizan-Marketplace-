@@ -5,11 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>GAyizan — Marketplace Haïtien</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet"/>
-
-<!-- ═══════════════════════════════════════════════════
-     SUPABASE SDK
-     ═══════════════════════════════════════════════════ -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 
 <style>
 :root{
@@ -18,6 +14,7 @@
   --bg:#F2EFF9;--card:#fff;
   --txt:#1A1730;--muted:#6E6888;--border:#DDD6F5;
   --red:#DC2626;--green:#16A34A;--greenl:#DCFCE7;
+  --orange:#D97706;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;-webkit-tap-highlight-color:transparent;}
@@ -58,14 +55,19 @@ header{background:var(--vd);padding:14px 18px;display:flex;align-items:center;ju
 .btn-primary{background:var(--v);color:#fff;box-shadow:0 4px 12px rgba(91,53,176,.3);}
 .btn-gold{background:var(--gold);color:#fff;box-shadow:0 4px 12px rgba(201,162,39,.3);}
 .btn-outline{background:transparent;color:var(--v);border:1.5px solid var(--v);}
+.btn-green{background:var(--green);color:#fff;}
 .btn-sm{padding:7px 13px;font-size:12px;border-radius:8px;}
 .btn-full{width:100%;}
 .btn-danger{background:#FEE2E2;color:var(--red);border:none;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
 
 /* CHIPS */
 .chip{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
 .chip-v{background:#EDE9FB;color:var(--v);}
 .chip-gold{background:#FBF5DC;color:var(--goldd);}
+.chip-green{background:var(--greenl);color:var(--green);}
+.chip-red{background:#FEE2E2;color:var(--red);}
+.chip-orange{background:#FEF3C7;color:var(--orange);}
 
 /* FORMS */
 input,select,textarea{width:100%;padding:12px 14px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:14px;color:var(--txt);background:#fff;outline:none;transition:border-color .2s;}
@@ -90,6 +92,15 @@ label{font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bot
 .auth-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:20px;}
 .auth-tab{flex:1;padding:10px;text-align:center;font-family:'Syne',sans-serif;font-weight:600;font-size:14px;cursor:pointer;color:var(--muted);border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .2s,border-color .2s;}
 .auth-tab.active{color:var(--v);border-bottom-color:var(--v);}
+
+/* ONBOARDING */
+.onboarding-step{text-align:center;padding:10px 0 6px;}
+.onboarding-icon{font-size:52px;margin-bottom:14px;}
+.onboarding-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px;}
+.onboarding-sub{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:22px;}
+.onboarding-progress{display:flex;gap:6px;justify-content:center;margin-bottom:24px;}
+.onboarding-dot{width:8px;height:8px;border-radius:50%;background:var(--border);}
+.onboarding-dot.active{background:var(--v);width:20px;border-radius:4px;}
 
 /* TOAST */
 .toast{position:fixed;top:76px;left:50%;transform:translateX(-50%) translateY(-14px);background:var(--txt);color:#fff;padding:11px 20px;border-radius:24px;font-size:13px;font-weight:500;opacity:0;transition:all .28s;z-index:999;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.25);pointer-events:none;max-width:90vw;}
@@ -177,15 +188,25 @@ label{font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bot
 .menu-label{font-size:14px;font-weight:500;}
 .menu-sub{font-size:11px;color:var(--muted);}
 .menu-arrow{color:var(--muted);font-size:18px;}
+.menu-badge{background:var(--red);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;font-family:'Syne',sans-serif;}
 
 /* MY PRODUCTS */
-.my-prod{display:flex;align-items:center;gap:10px;background:#fff;border-radius:13px;border:1px solid var(--border);padding:11px;}
+.my-prod{display:flex;align-items:center;gap:10px;background:#fff;border-radius:13px;border:1px solid var(--border);padding:11px;margin-bottom:10px;}
 .my-prod-img{width:50px;height:50px;border-radius:9px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
 .my-prod-info{flex:1;min-width:0;}
 .my-prod-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .my-prod-cat{font-size:11px;color:var(--muted);margin-top:1px;}
 .my-prod-price{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--v);margin-top:2px;}
 .my-prod-actions{display:flex;gap:6px;flex-shrink:0;}
+
+/* COMMANDES VENDEUR */
+.order-card{background:#fff;border-radius:13px;border:1px solid var(--border);padding:14px;margin-bottom:10px;}
+.order-card-top{display:flex;justify-content:space-between;align-items:start;margin-bottom:6px;}
+.order-card-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;flex:1;margin-right:8px;}
+.order-card-meta{font-size:12px;color:var(--muted);margin-bottom:8px;}
+.order-card-bottom{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.order-card-price{font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--v);}
+.order-actions{display:flex;gap:6px;}
 
 /* PAYMENT */
 .pay-methods{display:flex;flex-direction:column;gap:10px;margin:14px 0;}
@@ -214,6 +235,18 @@ label{font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bot
 
 .divider{height:1px;background:var(--border);margin:20px 0;}
 .section-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+
+/* TABS VENDEUR */
+.vendor-tabs{display:flex;border-bottom:2px solid var(--border);margin-bottom:16px;}
+.vendor-tab{flex:1;padding:10px;text-align:center;font-family:'Syne',sans-serif;font-weight:600;font-size:13px;cursor:pointer;color:var(--muted);border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .2s,border-color .2s;}
+.vendor-tab.active{color:var(--v);border-bottom-color:var(--v);}
+
+/* PROFIL COMPLET BANNER */
+.complete-banner{background:linear-gradient(135deg,#FBF5DC,#FEF3C7);border:1px solid var(--gold);border-radius:14px;padding:14px 16px;margin-bottom:16px;display:flex;align-items:center;gap:12px;}
+.complete-banner-icon{font-size:28px;flex-shrink:0;}
+.complete-banner-text{flex:1;}
+.complete-banner-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--goldd);margin-bottom:2px;}
+.complete-banner-sub{font-size:11px;color:var(--orange);}
 </style>
 </head>
 <body>
@@ -230,7 +263,7 @@ label{font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bot
   </div>
 </header>
 
-<!-- ACCUEIL -->
+<!-- ══ ACCUEIL ══ -->
 <div class="page active" id="page-home">
   <div class="hero-band">
     <h2>GAyizan 🇭🇹</h2>
@@ -252,7 +285,7 @@ label{font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bot
   <div class="products-grid" id="homeGrid"><div class="spinner"></div></div>
 </div>
 
-<!-- MARCHÉ -->
+<!-- ══ MARCHÉ ══ -->
 <div class="page" id="page-market">
   <div class="search-bar">
     <input class="search-input" placeholder="🔍  Rechercher…" id="searchInput" oninput="renderMarket()"/>
@@ -268,7 +301,7 @@ label{font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bot
   <div class="prod-list" id="marketList"><div class="spinner"></div></div>
 </div>
 
-<!-- VENDRE -->
+<!-- ══ VENDRE ══ -->
 <div class="page" id="page-sell">
   <div class="sell-hero">
     <h2>Publier un produit</h2>
@@ -280,7 +313,7 @@ label{font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bot
   <div class="field-row">
     <div class="field" style="margin-bottom:0;">
       <label>Prix (HTG) *</label>
-      <div class="input-prefix"><span class="prefix-label">HTG</span><input id="sellPrice" type="number" min="0" placeholder="0"/></div>
+      <div class="input-prefix"><span class="prefix-label">HTG</span><input id="sellPrice" type="number" min="1" placeholder="0"/></div>
     </div>
     <div class="field" style="margin-bottom:0;">
       <label>Catégorie *</label>
@@ -312,7 +345,31 @@ label{font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bot
   <button class="btn btn-primary btn-full" id="publishBtn" onclick="publishProduct()" style="margin-top:4px;">Publier le produit</button>
 </div>
 
-<!-- PROFIL -->
+<!-- ══ MES PRODUITS + COMMANDES REÇUES ══ -->
+<div class="page" id="page-my-products">
+  <div class="section-row">
+    <div class="section-title">Espace vendeur</div>
+    <button class="btn btn-primary btn-sm" onclick="navigate('sell')">+ Nouveau</button>
+  </div>
+  <div class="vendor-tabs">
+    <button class="vendor-tab active" id="vtab-products" onclick="switchVendorTab('products')">Mes produits</button>
+    <button class="vendor-tab" id="vtab-orders" onclick="switchVendorTab('orders')">Commandes reçues <span id="pendingBadge" style="display:none;" class="menu-badge">0</span></button>
+  </div>
+  <div id="vtab-products-content">
+    <div style="display:flex;flex-direction:column;" id="myProdList"></div>
+  </div>
+  <div id="vtab-orders-content" style="display:none;">
+    <div id="receivedOrdersList"></div>
+  </div>
+</div>
+
+<!-- ══ PANIER / MES COMMANDES ══ -->
+<div class="page" id="page-panier">
+  <div class="section-row"><div class="section-title">Mes commandes</div></div>
+  <div id="panierList"></div>
+</div>
+
+<!-- ══ PROFIL ══ -->
 <div class="page" id="page-profile">
   <div class="profile-header">
     <div class="profile-avatar" id="profileAvatar">?</div>
@@ -329,15 +386,16 @@ label{font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bot
     <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">Crée un compte gratuit pour publier tes produits</div>
     <button class="btn btn-primary btn-full btn-sm" onclick="openAuthModal()">Créer un compte / Se connecter</button>
   </div>
+  <div id="completeBannerWrap"></div>
   <div class="menu-list">
     <div class="menu-item" onclick="navigate('my-products')">
       <div class="menu-icon"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 3H8L6 7h12l-2-4z"/></svg></div>
-      <div class="menu-text"><div class="menu-label">Mes produits</div><div class="menu-sub">Gérer mes publications</div></div>
+      <div class="menu-text"><div class="menu-label">Espace vendeur</div><div class="menu-sub">Mes produits & commandes reçues</div></div>
       <span class="menu-arrow">›</span>
     </div>
     <div class="menu-item" onclick="navigate('panier')">
       <div class="menu-icon"><svg viewBox="0 0 24 24" stroke-width="1.8"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></div>
-      <div class="menu-text"><div class="menu-label">Mes commandes</div><div class="menu-sub">Historique des achats</div></div>
+      <div class="menu-text"><div class="menu-label">Mes achats</div><div class="menu-sub">Historique de mes commandes</div></div>
       <span class="menu-arrow">›</span>
     </div>
     <div class="menu-item" onclick="openEditModal()">
@@ -353,22 +411,7 @@ label{font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bot
   </div>
 </div>
 
-<!-- MES PRODUITS -->
-<div class="page" id="page-my-products">
-  <div class="section-row">
-    <div class="section-title">Mes produits</div>
-    <button class="btn btn-primary btn-sm" onclick="navigate('sell')">+ Nouveau</button>
-  </div>
-  <div style="display:flex;flex-direction:column;gap:10px;margin-top:12px;" id="myProdList"></div>
-</div>
-
-<!-- PANIER -->
-<div class="page" id="page-panier">
-  <div class="section-row"><div class="section-title">Mes commandes</div></div>
-  <div id="panierList"></div>
-</div>
-
-<!-- DETAIL -->
+<!-- ══ DETAIL ══ -->
 <div class="page" id="page-detail">
   <button onclick="goBack()" style="background:none;border:none;color:var(--v);font-size:13px;font-weight:600;cursor:pointer;margin-bottom:14px;display:flex;align-items:center;gap:5px;">← Retour</button>
   <div id="detailContent"></div>
@@ -388,7 +431,7 @@ label{font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bot
     <div class="nav-sell-circle"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
   </button>
   <button class="nav-item" id="nav-panier" onclick="navigate('panier')">
-    <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>Commandes
+    <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>Achats
   </button>
   <button class="nav-item" id="nav-profile" onclick="navigate('profile')">
     <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profil
@@ -422,17 +465,29 @@ label{font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bot
       <button class="auth-tab active" id="tabSignup" onclick="switchAuthTab('signup')">Créer un compte</button>
       <button class="auth-tab" id="tabSignin" onclick="switchAuthTab('signin')">Se connecter</button>
     </div>
+    <!-- INSCRIPTION -->
     <div id="authSignup">
       <div class="field"><label>Email *</label><input id="signupEmail" type="email" placeholder="ton@email.com"/></div>
       <div class="field"><label>Mot de passe *</label><input id="signupPass" type="password" placeholder="6 caractères minimum"/></div>
-      <button class="btn btn-primary btn-full" onclick="doSignUp()">Créer mon compte</button>
+      <button class="btn btn-primary btn-full" id="signupBtn" onclick="doSignUp()">Créer mon compte</button>
+      <p style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.5;">Un email de confirmation te sera envoyé.<br>Vérifie ta boîte mail avant de te connecter.</p>
     </div>
+    <!-- CONNEXION -->
     <div id="authSignin" style="display:none;">
       <div class="field"><label>Email *</label><input id="signinEmail" type="email" placeholder="ton@email.com"/></div>
       <div class="field"><label>Mot de passe *</label><input id="signinPass" type="password" placeholder="Ton mot de passe"/></div>
-      <button class="btn btn-primary btn-full" onclick="doSignIn()">Se connecter</button>
+      <button class="btn btn-primary btn-full" id="signinBtn" onclick="doSignIn()">Se connecter</button>
+      <button style="background:none;border:none;color:var(--v);font-size:12px;cursor:pointer;width:100%;margin-top:10px;text-align:center;" onclick="doForgotPassword()">Mot de passe oublié ?</button>
     </div>
     <button class="btn btn-outline btn-full" onclick="closeModal('authModal')" style="margin-top:10px;">Annuler</button>
+  </div>
+</div>
+
+<!-- MODAL: ONBOARDING (après 1ère inscription) -->
+<div class="modal-overlay" id="onboardModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div id="onboardContent"></div>
   </div>
 </div>
 
@@ -440,95 +495,104 @@ label{font-size:12px;font-weight:600;color:var(--muted);display:block;margin-bot
 
 <script>
 // ═══════════════════════════════════════════════════════════════
-// 🔧 CONFIGURATION SUPABASE
-// Remplace ces valeurs par les tiennes :
-// Supabase → Settings → API → Project URL & anon public key
+// CONFIG SUPABASE
 // ═══════════════════════════════════════════════════════════════
-const SUPABASE_URL = 'https://ovzzrbnryxxwwpnikxss.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_6mjJQQkSXKWz8du2jASsNg_Kd5j9936';
-
+const SUPABASE_URL = 'https://ybladedzaagmlkefnpwv.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlibGFkZWR6YWFnbWxrZWZucHd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1MDA4NzUsImV4cCI6MjA5NDA3Njg3NX0.mvd8lV7sYHDqEGevDb6xMbsHMJRqPf8--kDY2D8igqg';
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // ═══════════════════════════════════════════════════════════════
-// STATE LOCAL (commandes, profil, UI)
+// STATE
 // ═══════════════════════════════════════════════════════════════
-const LOCAL_KEY = 'gayizan_v4';
-
-function loadLocal() {
-  try { const r = localStorage.getItem(LOCAL_KEY); return r ? JSON.parse(r) : null; } catch(e) { return null; }
-}
-function saveLocal() {
-  try { localStorage.setItem(LOCAL_KEY, JSON.stringify({
-    orders: S.orders, profile: S.profile, homeCat: S.homeCat, mktCat: S.mktCat
-  })); } catch(e) {}
-}
-
-const _local = loadLocal() || {};
 const S = {
   page: 'home', prev: null,
-  products: [],         // chargés depuis Supabase
-  orders: _local.orders || [],
-  profile: _local.profile || { name:'', wa:'', mc:'', nc:'', sales:0 },
-  homeCat: _local.homeCat || 'all',
-  mktCat:  _local.mktCat  || 'all',
+  products: [],
+  myOrders: [],       // commandes passées (acheteur)
+  receivedOrders: [], // commandes reçues (vendeur)
+  profile: { name:'', whatsapp:'', moncash:'', natcash:'' },
+  homeCat: 'all',
+  mktCat: 'all',
   emoji: '📚',
   detailId: null,
-  user: null,           // session Supabase
+  user: null,
+  vendorTab: 'products',
 };
 
 // ═══════════════════════════════════════════════════════════════
 // AUTH
 // ═══════════════════════════════════════════════════════════════
-sb.auth.onAuthStateChange((event, session) => {
+sb.auth.onAuthStateChange(async (event, session) => {
   S.user = session?.user || null;
+  if (S.user) {
+    await loadProfile();
+    await loadMyOrders();
+    await loadReceivedOrders();
+  } else {
+    S.profile = { name:'', whatsapp:'', moncash:'', natcash:'' };
+    S.myOrders = [];
+    S.receivedOrders = [];
+  }
   updateAuthUI();
   if (event === 'SIGNED_IN') {
     toast('✅ Connecté !', 'success');
     closeModal('authModal');
+    // Onboarding si profil vide
+    if (!S.profile.name) setTimeout(() => openOnboarding(), 500);
   }
   if (event === 'SIGNED_OUT') toast('Déconnecté');
 });
 
 function updateAuthUI() {
   const u = S.user;
-  const logoutItem = document.getElementById('logoutItem');
+  const logoutItem  = document.getElementById('logoutItem');
   const authBanner  = document.getElementById('authBanner');
   if (logoutItem) logoutItem.style.display = u ? 'flex' : 'none';
   if (authBanner)  authBanner.style.display = u ? 'none' : 'block';
   const name = S.profile.name || (u ? u.email?.split('@')[0] : '?');
-  const initial = (name[0] || '?').toUpperCase();
-  document.getElementById('avatarBtn').textContent = initial;
+  document.getElementById('avatarBtn').textContent = (name[0]||'?').toUpperCase();
 }
 
-function handleAvatarClick() {
-  navigate('profile');
-}
-
+function handleAvatarClick() { navigate('profile'); }
 function openAuthModal() { document.getElementById('authModal').classList.add('open'); }
 
 function switchAuthTab(tab) {
   document.getElementById('authSignup').style.display = tab === 'signup' ? 'block' : 'none';
-  document.getElementById('authSignin').style.display = tab === 'signin' ? 'block' : 'none';
+  document.getElementById('authSignin').style.display = tab === 'signin'  ? 'block' : 'none';
   document.getElementById('tabSignup').classList.toggle('active', tab === 'signup');
-  document.getElementById('tabSignin').classList.toggle('active', tab === 'signin');
+  document.getElementById('tabSignin').classList.toggle('active',  tab === 'signin');
 }
 
 async function doSignUp() {
   const email = document.getElementById('signupEmail').value.trim();
   const pass  = document.getElementById('signupPass').value;
   if (!email || pass.length < 6) { toast('⚠️ Email valide + 6 caractères minimum', 'error'); return; }
+  const btn = document.getElementById('signupBtn');
+  btn.disabled = true; btn.textContent = 'Création…';
   const { error } = await sb.auth.signUp({ email, password: pass });
+  btn.disabled = false; btn.textContent = 'Créer mon compte';
   if (error) { toast('❌ ' + error.message, 'error'); return; }
-  toast('✅ Compte créé ! Vérifie ton email.', 'success');
   closeModal('authModal');
+  toast('✅ Compte créé ! Vérifie ton email puis connecte-toi.', 'success');
+  setTimeout(() => switchAuthTab('signin'), 800);
 }
 
 async function doSignIn() {
   const email = document.getElementById('signinEmail').value.trim();
   const pass  = document.getElementById('signinPass').value;
   if (!email || !pass) { toast('⚠️ Remplis les deux champs', 'error'); return; }
+  const btn = document.getElementById('signinBtn');
+  btn.disabled = true; btn.textContent = 'Connexion…';
   const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  btn.disabled = false; btn.textContent = 'Se connecter';
   if (error) { toast('❌ Email ou mot de passe incorrect', 'error'); }
+}
+
+async function doForgotPassword() {
+  const email = document.getElementById('signinEmail').value.trim();
+  if (!email) { toast('⚠️ Saisis ton email d\'abord', 'error'); return; }
+  const { error } = await sb.auth.resetPasswordForEmail(email);
+  if (error) { toast('❌ ' + error.message, 'error'); return; }
+  toast('✅ Lien de réinitialisation envoyé !', 'success');
 }
 
 async function signOut() {
@@ -537,36 +601,136 @@ async function signOut() {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// SUPABASE — CHARGEMENT PRODUITS
+// PROFIL SUPABASE
+// ═══════════════════════════════════════════════════════════════
+async function loadProfile() {
+  if (!S.user) return;
+  const { data, error } = await sb
+    .from('profiles')
+    .select('*')
+    .eq('id', S.user.id)
+    .maybeSingle();
+
+  if (error) { console.error('loadProfile:', error); return; }
+  if (data) {
+    S.profile = {
+      name: data.name || '', whatsapp: data.whatsapp || '',
+      moncash: data.moncash || '', natcash: data.natcash || '',
+      sales_count: data.sales_count || 0,
+    };
+  } else {
+    await sb.from('profiles').insert({
+      id: S.user.id, name: '', whatsapp: '', moncash: '', natcash: '', sales_count: 0
+    });
+  }
+}
+
+async function saveOnboarding() {
+  // Reads from onboarding-specific field IDs
+  const name = document.getElementById('onbName').value.trim();
+  const wa   = document.getElementById('onbWa').value.trim();
+  if (!name) { toast('⚠️ Le nom ne peut pas être vide', 'error'); return; }
+  if (!wa)   { toast('⚠️ Le numéro WhatsApp est obligatoire', 'error'); return; }
+  const update = {
+    name, whatsapp: wa,
+    moncash: document.getElementById('onbMc').value.trim(),
+    natcash: document.getElementById('onbNc').value.trim(),
+  };
+  if (S.user) {
+    const { error } = await sb.from('profiles').upsert({ id: S.user.id, ...update });
+    if (error) { toast('❌ Erreur lors de la sauvegarde', 'error'); return; }
+  }
+  S.profile = { ...S.profile, ...update };
+  closeModal('onboardModal');
+  renderProfile();
+  toast('✅ Profil configuré !', 'success');
+}
+
+async function saveProfile() {
+  const name = document.getElementById('editName').value.trim();
+  const wa   = document.getElementById('editWa').value.trim();
+  if (!name) { toast('⚠️ Le nom ne peut pas être vide', 'error'); return; }
+  if (!wa)   { toast('⚠️ Le numéro WhatsApp est obligatoire', 'error'); return; }
+
+  const update = {
+    name,
+    whatsapp: wa,
+    moncash:  document.getElementById('editMc').value.trim(),
+    natcash:  document.getElementById('editNc').value.trim(),
+  };
+
+  if (S.user) {
+    const { error } = await sb.from('profiles').upsert({ id: S.user.id, ...update });
+    if (error) { toast('❌ Erreur lors de la sauvegarde', 'error'); return; }
+  }
+
+  S.profile = { ...S.profile, ...update };
+  closeModal('editModal');
+  closeModal('onboardModal');
+  renderProfile();
+  toast('✅ Profil mis à jour', 'success');
+}
+
+function openEditModal() {
+  document.getElementById('editName').value = S.profile.name     || '';
+  document.getElementById('editWa').value   = S.profile.whatsapp || '';
+  document.getElementById('editMc').value   = S.profile.moncash  || '';
+  document.getElementById('editNc').value   = S.profile.natcash  || '';
+  document.getElementById('editModal').classList.add('open');
+}
+
+function isProfileComplete() { return S.profile.name && S.profile.whatsapp; }
+
+// ═══════════════════════════════════════════════════════════════
+// ONBOARDING
+// ═══════════════════════════════════════════════════════════════
+function openOnboarding() {
+  document.getElementById('onboardContent').innerHTML = `
+    <div class="onboarding-step">
+      <div class="onboarding-icon">🎉</div>
+      <div class="onboarding-title">Bienvenue sur GAyizan !</div>
+      <div class="onboarding-sub">Pour commencer à acheter et vendre, configure ton profil en 30 secondes.</div>
+      <div class="onboarding-progress">
+        <div class="onboarding-dot active"></div>
+        <div class="onboarding-dot"></div>
+      </div>
+    </div>
+    <div class="field"><label>Ton nom d'affichage *</label><input id="onbName" placeholder="Ex : Jean Pierre" maxlength="40"/></div>
+    <div class="field"><label>Ton numéro WhatsApp *</label><input id="onbWa" placeholder="+509 XXXX XXXX" type="tel" maxlength="16"/></div>
+    <div class="field"><label>MonCash (pour recevoir des paiements)</label><input id="onbMc" placeholder="+509 XXXX XXXX" type="tel" maxlength="16"/></div>
+    <div class="field"><label>NatCash (pour recevoir des paiements)</label><input id="onbNc" placeholder="+509 XXXX XXXX" type="tel" maxlength="16"/></div>
+    <button class="btn btn-primary btn-full" onclick="saveOnboarding()">Terminer la configuration →</button>
+    <button style="background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;width:100%;margin-top:10px;text-align:center;" onclick="closeModal('onboardModal')">Plus tard</button>
+  `;
+  document.getElementById('onboardModal').classList.add('open');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PRODUITS SUPABASE
 // ═══════════════════════════════════════════════════════════════
 async function loadProducts() {
   setSyncStatus('loading');
   const { data, error } = await sb
     .from('products')
     .select('*')
+    .eq('is_active', true)
     .order('created_at', { ascending: false });
 
-  if (error) {
-    setSyncStatus('error');
-    toast('⚠️ Erreur de chargement', 'error');
-    console.error(error);
-    return;
-  }
+  if (error) { setSyncStatus('error'); toast('⚠️ Erreur de chargement', 'error'); return; }
 
-  // Mapper les champs Supabase → noms internes
   S.products = (data || []).map(p => ({
-    id: p.id,
-    name: p.name,
-    desc: p.description,
-    cat: p.category,
-    emoji: p.emoji || '📦',
+    id:     p.id,
+    name:   p.name,
+    desc:   p.description,
+    cat:    p.category,
+    emoji:  p.emoji || '📦',
     seller: p.seller_name,
-    phone: p.whatsapp,
-    mc: p.moncash,
-    nc: p.natcash,
-    price: p.price,
-    views: p.views || 0,
-    uid: p.user_id,
+    phone:  p.whatsapp,
+    mc:     p.moncash,
+    nc:     p.natcash,
+    price:  p.price,
+    views:  p.views || 0,
+    uid:    p.user_id,
   }));
 
   setSyncStatus('ok');
@@ -577,14 +741,56 @@ async function loadProducts() {
 
 function setSyncStatus(s) {
   const dot = document.getElementById('syncDot');
-  dot.className = 'sync-dot' + (s === 'ok' ? '' : s === 'error' ? ' error' : ' loading');
+  dot.className = 'sync-dot' + (s==='ok'?'':s==='error'?' error':' loading');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COMMANDES ACHETEUR
+// ═══════════════════════════════════════════════════════════════
+async function loadMyOrders() {
+  if (!S.user) return;
+  const { data } = await sb
+    .from('orders')
+    .select('*')
+    .eq('buyer_id', S.user.id)
+    .order('created_at', { ascending: false });
+  S.myOrders = data || [];
+  updateCartBadge();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// COMMANDES VENDEUR
+// ═══════════════════════════════════════════════════════════════
+async function loadReceivedOrders() {
+  if (!S.user) return;
+  const { data } = await sb
+    .from('orders')
+    .select('*')
+    .eq('seller_id', S.user.id)
+    .order('created_at', { ascending: false });
+  S.receivedOrders = data || [];
+  updatePendingBadge();
+}
+
+function updatePendingBadge() {
+  const pending = S.receivedOrders.filter(o => o.status === 'pending').length;
+  const badge = document.getElementById('pendingBadge');
+  if (!badge) return;
+  if (pending > 0) { badge.textContent = pending; badge.style.display = 'inline-block'; }
+  else { badge.style.display = 'none'; }
+}
+
+async function updateOrderStatus(orderId, status) {
+  const { error } = await sb.from('orders').update({ status }).eq('id', orderId);
+  if (error) { toast('❌ Erreur lors de la mise à jour', 'error'); return; }
+  await loadReceivedOrders();
+  renderReceivedOrders();
+  toast(status === 'confirmed' ? '✅ Commande confirmée' : '❌ Commande annulée');
 }
 
 // ═══════════════════════════════════════════════════════════════
 // UTILS
 // ═══════════════════════════════════════════════════════════════
-function allProds() { return S.products; }
-
 function catLabel(c) {
   return {
     formation:'📚 Cours & Formation',
@@ -594,16 +800,22 @@ function catLabel(c) {
     digital:'💾 Produits digitaux',
   }[c] || c;
 }
-
 function formatPrice(p) {
-  if (!p && p !== 0) return '—';
+  if (!p && p!==0) return '—';
   return parseInt(p).toLocaleString('fr-HT') + ' HTG';
 }
 function formatPhone(n) {
   if (!n) return '';
   return n.replace(/(\+509)(\d{4})(\d{4})/, '$1 $2 $3');
 }
-function isProfileComplete() { return S.profile.name && S.profile.wa; }
+function statusChip(s) {
+  if (s==='confirmed') return '<span class="chip chip-green">✅ Confirmé</span>';
+  if (s==='cancelled') return '<span class="chip chip-red">✗ Annulé</span>';
+  return '<span class="chip chip-orange">⏳ En attente</span>';
+}
+function fmtDate(d) {
+  return new Date(d).toLocaleDateString('fr-HT', { day:'2-digit', month:'short', year:'numeric' });
+}
 
 // ═══════════════════════════════════════════════════════════════
 // NAVIGATION
@@ -617,33 +829,29 @@ function navigate(p) {
     const el = document.getElementById('nav-' + n);
     if (el) el.classList.toggle('active', n === p);
   });
-  if (p === 'home')        renderHome();
-  if (p === 'market')      renderMarket();
-  if (p === 'my-products') renderMyProds();
-  if (p === 'profile')     renderProfile();
-  if (p === 'panier')      renderPanier();
-  window.scrollTo(0, 0);
+  if (p==='home')        renderHome();
+  if (p==='market')      renderMarket();
+  if (p==='my-products') { renderMyProds(); renderReceivedOrders(); }
+  if (p==='profile')     renderProfile();
+  if (p==='panier')      renderPanier();
+  window.scrollTo(0,0);
 }
 function goBack() { navigate(S.prev || 'home'); }
 
 // ═══════════════════════════════════════════════════════════════
-// TOAST
+// TOAST / MODAL
 // ═══════════════════════════════════════════════════════════════
 let toastTimer;
 function toast(msg, type='') {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.className = 'toast show' + (type ? ' ' + type : '');
+  t.className = 'toast show' + (type?' '+type:'');
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
 }
-
-// ═══════════════════════════════════════════════════════════════
-// MODAL
-// ═══════════════════════════════════════════════════════════════
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 document.querySelectorAll('.modal-overlay').forEach(o => {
-  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+  o.addEventListener('click', e => { if (e.target===o) o.classList.remove('open'); });
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -651,8 +859,9 @@ document.querySelectorAll('.modal-overlay').forEach(o => {
 // ═══════════════════════════════════════════════════════════════
 function updateCartBadge() {
   const badge = document.getElementById('cartBadge');
-  badge.textContent = S.orders.length;
-  badge.classList.toggle('show', S.orders.length > 0);
+  const n = S.myOrders.length;
+  badge.textContent = n;
+  badge.classList.toggle('show', n > 0);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -660,18 +869,17 @@ function updateCartBadge() {
 // ═══════════════════════════════════════════════════════════════
 function filterHomeCat(el, cat) {
   document.querySelectorAll('#homeCats .cat-pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active'); S.homeCat = cat; saveLocal(); renderHome();
+  el.classList.add('active'); S.homeCat = cat; renderHome();
 }
-
 function renderHome() {
-  const all = allProds();
-  const list = S.homeCat === 'all' ? all : all.filter(p => p.cat === S.homeCat);
+  const all  = S.products;
+  const list = S.homeCat==='all' ? all : all.filter(p => p.cat===S.homeCat);
   const grid = document.getElementById('homeGrid');
   if (!list.length) {
     grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--muted);padding:30px 0;font-size:13px;">Aucun produit dans cette catégorie.</div>';
     return;
   }
-  grid.innerHTML = list.slice(0, 8).map(p => `
+  grid.innerHTML = list.slice(0,8).map(p => `
     <div class="prod-card" onclick="openDetail(${p.id})">
       <div class="prod-img">${p.emoji}</div>
       <div class="prod-info">
@@ -687,13 +895,12 @@ function renderHome() {
 // ═══════════════════════════════════════════════════════════════
 function filterMktCat(el, cat) {
   document.querySelectorAll('#marketCats .cat-pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active'); S.mktCat = cat; saveLocal(); renderMarket();
+  el.classList.add('active'); S.mktCat = cat; renderMarket();
 }
-
 function renderMarket() {
-  const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
-  let list = allProds();
-  if (S.mktCat !== 'all') list = list.filter(p => p.cat === S.mktCat);
+  const q = (document.getElementById('searchInput')?.value||'').toLowerCase();
+  let list = S.products;
+  if (S.mktCat!=='all') list = list.filter(p => p.cat===S.mktCat);
   if (q) list = list.filter(p =>
     p.name.toLowerCase().includes(q) ||
     (p.desc||'').toLowerCase().includes(q) ||
@@ -712,24 +919,33 @@ function renderMarket() {
         <div class="prod-row-desc">${(p.desc||'').substring(0,100)}…</div>
         <div class="prod-row-bottom">
           <div class="prod-row-price">${formatPrice(p.price)}</div>
-          <div class="prod-row-seller">${p.seller} · <span style="color:var(--muted);">${catLabel(p.cat)}</span></div>
+          <div class="prod-row-seller">${p.seller}</div>
         </div>
       </div>
     </div>`).join('');
 }
 
 // ═══════════════════════════════════════════════════════════════
-// DETAIL
+// DETAIL + VUES ANTI-BOURRAGE
 // ═══════════════════════════════════════════════════════════════
 async function openDetail(id) {
-  const p = allProds().find(x => x.id === id);
+  const p = S.products.find(x => x.id===id);
   if (!p) return;
   S.detailId = id;
   navigate('detail');
 
-  // Incrémenter vues dans Supabase
-  sb.from('products').update({ views: (p.views || 0) + 1 }).eq('id', id).then(() => {});
-  p.views = (p.views || 0) + 1;
+  // Vue unique par utilisateur connecté
+  if (S.user && S.user.id !== p.uid) {
+    sb.from('product_views')
+      .insert({ product_id: id, viewer_id: S.user.id })
+      .then(async ({ error }) => {
+        if (!error) {
+          // Incrémenter le compteur seulement si vue nouvelle
+          await sb.from('products').update({ views: p.views + 1 }).eq('id', id);
+          p.views += 1;
+        }
+      });
+  }
 
   const hasMc = p.mc && p.mc.trim();
   const hasNc = p.nc && p.nc.trim();
@@ -766,7 +982,12 @@ function openWA(phone, name, price) {
 // PAIEMENT
 // ═══════════════════════════════════════════════════════════════
 function openPayFlow(id) {
-  const p = allProds().find(x => x.id === id);
+  if (!S.user) {
+    toast('⚠️ Connecte-toi pour passer une commande', 'error');
+    setTimeout(() => openAuthModal(), 600);
+    return;
+  }
+  const p = S.products.find(x => x.id===id);
   if (!p) return;
   const hasMc = p.mc && p.mc.trim();
   const hasNc = p.nc && p.nc.trim();
@@ -784,15 +1005,15 @@ function openPayFlow(id) {
 
 function selPayMethod(m, id) {
   document.querySelectorAll('.pay-method').forEach(x => x.classList.remove('selected'));
-  document.getElementById('pm-' + m)?.classList.add('selected');
-  setTimeout(() => showPayStep2(m, id), 280);
+  document.getElementById('pm-'+m)?.classList.add('selected');
+  setTimeout(() => showPayStep2(m,id), 280);
 }
 
 function showPayStep2(m, id) {
-  const p = allProds().find(x => x.id === id);
-  const num = m === 'mc' ? p.mc : p.nc;
-  const label = m === 'mc' ? 'MonCash' : 'NatCash';
-  const steps = m === 'mc'
+  const p = S.products.find(x => x.id===id);
+  const num   = m==='mc' ? p.mc : p.nc;
+  const label = m==='mc' ? 'MonCash' : 'NatCash';
+  const steps = m==='mc'
     ? '1. Ouvre MonCash<br>2. Sélectionne <strong>« Payer »</strong><br>3. Saisis le numéro ci-dessous<br>4. Entre le montant exact<br>5. Envoie la capture au vendeur'
     : '1. Ouvre NatCash<br>2. Sélectionne <strong>« Envoyer de l\'argent »</strong><br>3. Saisis le numéro ci-dessous<br>4. Entre le montant exact<br>5. Envoie la capture au vendeur';
   document.getElementById('payModalContent').innerHTML = `
@@ -802,121 +1023,61 @@ function showPayStep2(m, id) {
     <div class="pay-phone-display"><div class="pay-phone-num">${formatPhone(num)}</div><div class="pay-phone-label">${p.seller}</div></div>
     <div class="pay-steps-box"><strong>Étapes :</strong><br>${steps}</div>
     <div class="pay-warning">⚠️ Après paiement, envoie ta capture d'écran au vendeur sur WhatsApp.</div>
-    <button class="btn btn-gold btn-full" onclick="confirmPay(${id},'${label}')">✅ J'ai effectué le paiement</button>
+    <button class="btn btn-gold btn-full" onclick="confirmPay(${id},'${label}','${m}')">✅ J'ai effectué le paiement</button>
     <button class="btn btn-outline btn-full" style="margin-top:10px;" onclick="openWA('${p.phone}','${encodeURIComponent(p.name)}','${formatPrice(p.price)}')">📱 Envoyer la preuve sur WhatsApp</button>
     <button style="margin-top:10px;background:none;border:none;color:var(--muted);font-size:12px;cursor:pointer;width:100%;" onclick="openPayFlow(${id})">← Changer de méthode</button>`;
 }
 
-async function confirmPay(id, label) {
-  const p = allProds().find(x => x.id === id);
-  if (!p) return;
+async function confirmPay(id, label, method) {
+  const p = S.products.find(x => x.id===id);
+  if (!p || !S.user) return;
 
-  // Enregistrer dans Supabase
-  await sb.from('orders').insert([{
-    product_id: id,
-    buyer_name: S.profile.name || 'Anonyme',
-    seller_name: p.seller,
-    amount: p.price,
-    payment_method: label,
-    status: 'pending',
-  }]);
+  const { data, error } = await sb.rpc('create_order', {
+    p_product_id:     id,
+    p_buyer_name:     S.profile.name || S.user.email?.split('@')[0] || 'Acheteur',
+    p_payment_method: label,
+    p_amount:         p.price,
+  });
 
-  const order = {
-    id: Date.now(), prodId: id, prodName: p.name, seller: p.seller,
-    price: p.price, method: label,
-    status: 'en attente', date: new Date().toLocaleDateString('fr-HT'),
-    phone: p.phone,
-  };
-  S.orders.unshift(order);
-  S.profile.sales = (S.profile.sales || 0) + 1;
-  saveLocal(); updateCartBadge();
+  if (error) {
+    const msg = (error.message||'').includes('propre produit')
+      ? '⚠️ Tu ne peux pas acheter ton propre produit'
+      : '❌ Erreur lors de l\'enregistrement';
+    toast(msg,'error'); console.error(error); return;
+  }
+
+
+  S.myOrders.unshift(data);
+  updateCartBadge();
 
   document.getElementById('payModalContent').innerHTML = `
     <div style="text-align:center;padding:16px 0;">
       <div style="font-size:52px;margin-bottom:14px;">✅</div>
       <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;margin-bottom:8px;">Paiement enregistré</div>
-      <p style="font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:20px;">Ton paiement via <strong>${label}</strong> est enregistré.<br>Envoie maintenant la capture au vendeur.</p>
+      <p style="font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:20px;">Ton paiement via <strong>${label}</strong> est enregistré.<br>Envoie maintenant ta capture au vendeur.<br><br>Le vendeur confirmera ta commande sous peu.</p>
       <button class="btn btn-gold btn-full" onclick="openWA('${p.phone}','${encodeURIComponent(p.name)}','${formatPrice(p.price)}')">📱 Envoyer la preuve sur WhatsApp</button>
       <button class="btn btn-outline btn-full" style="margin-top:10px;" onclick="closeModal('payModal');navigate('panier')">Voir mes commandes</button>
     </div>`;
 }
 
 // ═══════════════════════════════════════════════════════════════
-// VENTE — PUBLICATION SUPABASE
-// ═══════════════════════════════════════════════════════════════
-function pickEmoji(el) {
-  document.querySelectorAll('.emoji-opt').forEach(e => e.classList.remove('selected'));
-  el.classList.add('selected'); S.emoji = el.dataset.e;
-}
-
-async function publishProduct() {
-  if (!S.user) {
-    toast('⚠️ Connecte-toi pour publier un produit', 'error');
-    setTimeout(() => openAuthModal(), 600);
-    return;
-  }
-  if (!isProfileComplete()) {
-    toast('⚠️ Configure d\'abord ton profil (nom + WhatsApp)', 'error');
-    setTimeout(() => openEditModal(), 600);
-    return;
-  }
-
-  const name  = document.getElementById('sellName').value.trim();
-  const desc  = document.getElementById('sellDesc').value.trim();
-  const cat   = document.getElementById('sellCat').value;
-  const price = document.getElementById('sellPrice').value;
-  const phone = document.getElementById('sellPhone').value.trim() || S.profile.wa;
-  const mc    = document.getElementById('sellMc').value.trim()    || S.profile.mc;
-  const nc    = document.getElementById('sellNc').value.trim()    || S.profile.nc;
-
-  if (!name || !desc || !cat || !price) { toast('⚠️ Remplis tous les champs obligatoires', 'error'); return; }
-  if (parseInt(price) <= 0)             { toast('⚠️ Le prix doit être supérieur à 0 HTG', 'error'); return; }
-  if (!phone)                           { toast('⚠️ Saisis un numéro WhatsApp', 'error'); return; }
-
-  const btn = document.getElementById('publishBtn');
-  btn.disabled = true; btn.textContent = 'Publication…';
-
-  const { error } = await sb.from('products').insert([{
-    name,
-    description: desc,
-    category: cat,
-    emoji: S.emoji,
-    seller_name: S.profile.name,
-    whatsapp: phone,
-    moncash: mc,
-    natcash: nc,
-    price: parseInt(price),
-    views: 0,
-    user_id: S.user.id,
-  }]);
-
-  btn.disabled = false; btn.textContent = 'Publier le produit';
-
-  if (error) { toast('❌ Erreur lors de la publication', 'error'); console.error(error); return; }
-
-  // Reset form
-  ['sellName','sellDesc','sellPrice','sellPhone','sellMc','sellNc'].forEach(id => {
-    document.getElementById(id).value = '';
-  });
-  document.getElementById('sellCat').value = '';
-  document.querySelectorAll('.emoji-opt').forEach((e,i) => e.classList.toggle('selected', i===0));
-  S.emoji = '📚';
-
-  toast('✅ Produit publié avec succès !', 'success');
-  await loadProducts();
-  setTimeout(() => navigate('my-products'), 800);
-}
-
-// ═══════════════════════════════════════════════════════════════
 // MES PRODUITS
 // ═══════════════════════════════════════════════════════════════
+function switchVendorTab(tab) {
+  S.vendorTab = tab;
+  document.getElementById('vtab-products').classList.toggle('active', tab==='products');
+  document.getElementById('vtab-orders').classList.toggle('active', tab==='orders');
+  document.getElementById('vtab-products-content').style.display = tab==='products'?'block':'none';
+  document.getElementById('vtab-orders-content').style.display   = tab==='orders'  ?'block':'none';
+}
+
 function renderMyProds() {
   const el = document.getElementById('myProdList');
   if (!S.user) {
     el.innerHTML = `<div class="empty-state"><div class="empty-icon">🔒</div><div class="empty-txt">Connecte-toi pour voir tes produits.</div><button class="btn btn-primary btn-sm" onclick="openAuthModal()">Se connecter</button></div>`;
     return;
   }
-  const mine = S.products.filter(p => p.uid === S.user.id);
+  const mine = S.products.filter(p => p.uid===S.user.id);
   if (!mine.length) {
     el.innerHTML = `<div class="empty-state"><div class="empty-icon">📦</div><div class="empty-txt">Tu n'as pas encore publié de produit.</div><button class="btn btn-primary btn-sm" onclick="navigate('sell')">+ Publier maintenant</button></div>`;
     return;
@@ -938,7 +1099,7 @@ function renderMyProds() {
 
 async function delProd(id) {
   if (!confirm('Supprimer ce produit ?')) return;
-  const { error } = await sb.from('products').delete().eq('id', id);
+  const { error } = await sb.from('products').update({ is_active: false }).eq('id', id);
   if (error) { toast('❌ Erreur lors de la suppression', 'error'); return; }
   toast('Produit supprimé');
   await loadProducts();
@@ -946,74 +1107,170 @@ async function delProd(id) {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// COMMANDES
+// COMMANDES REÇUES (VENDEUR)
 // ═══════════════════════════════════════════════════════════════
-function renderPanier() {
-  const el = document.getElementById('panierList');
-  if (!S.orders.length) {
-    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🛒</div><div class="empty-txt">Tu n'as encore effectué aucune commande.</div><button class="btn btn-primary btn-sm" onclick="navigate('market')">Explorer le marché</button></div>`;
+function renderReceivedOrders() {
+  const el = document.getElementById('receivedOrdersList');
+  if (!S.user) { el.innerHTML = ''; return; }
+  updatePendingBadge();
+  if (!S.receivedOrders.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-txt">Aucune commande reçue pour l'instant.</div></div>`;
     return;
   }
-  el.innerHTML = S.orders.map(o => `
-    <div style="background:#fff;border-radius:13px;border:1px solid var(--border);padding:14px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:6px;">
-        <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;flex:1;margin-right:8px;">${o.prodName}</div>
-        <span class="chip chip-v" style="font-size:10px;white-space:nowrap;">${o.method}</span>
+  el.innerHTML = S.receivedOrders.map(o => `
+    <div class="order-card">
+      <div class="order-card-top">
+        <div class="order-card-name">${o.product_name}</div>
+        ${statusChip(o.status)}
       </div>
-      <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">Vendeur : ${o.seller} · ${o.date}</div>
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--v);">${formatPrice(o.price)}</div>
-        <button class="btn btn-sm btn-outline" onclick="openWA('${o.phone}','${encodeURIComponent(o.prodName)}','${formatPrice(o.price)}')">📱 WhatsApp</button>
+      <div class="order-card-meta">
+        Acheteur : <strong>${o.buyer_name}</strong> · ${o.payment_method} · ${fmtDate(o.created_at)}
+      </div>
+      <div class="order-card-bottom">
+        <div class="order-card-price">${formatPrice(o.amount)}</div>
+        <div class="order-actions">
+          ${o.status==='pending' ? `
+            <button class="btn btn-green btn-sm" onclick="updateOrderStatus(${o.id},'confirmed')">✅ Confirmer</button>
+            <button class="btn btn-danger btn-sm" onclick="updateOrderStatus(${o.id},'cancelled')">✗</button>
+          ` : ''}
+        </div>
       </div>
     </div>`).join('');
 }
 
 // ═══════════════════════════════════════════════════════════════
-// PROFIL
+// MES ACHATS (ACHETEUR)
+// ═══════════════════════════════════════════════════════════════
+function renderPanier() {
+  const el = document.getElementById('panierList');
+  if (!S.user) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🔒</div><div class="empty-txt">Connecte-toi pour voir tes commandes.</div><button class="btn btn-primary btn-sm" onclick="openAuthModal()">Se connecter</button></div>`;
+    return;
+  }
+  if (!S.myOrders.length) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-icon">🛒</div><div class="empty-txt">Tu n'as encore effectué aucune commande.</div><button class="btn btn-primary btn-sm" onclick="navigate('market')">Explorer le marché</button></div>`;
+    return;
+  }
+  el.innerHTML = S.myOrders.map(o => `
+    <div class="order-card">
+      <div class="order-card-top">
+        <div class="order-card-name">${o.product_name}</div>
+        ${statusChip(o.status)}
+      </div>
+      <div class="order-card-meta">
+        Vendeur : ${o.seller_name} · ${o.payment_method} · ${fmtDate(o.created_at)}
+      </div>
+      <div class="order-card-bottom">
+        <div class="order-card-price">${formatPrice(o.amount)}</div>
+      </div>
+    </div>`).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// PROFIL PAGE
 // ═══════════════════════════════════════════════════════════════
 function renderProfile() {
   const name = S.profile.name || (S.user?.email?.split('@')[0]) || 'Mon Profil';
   document.getElementById('profileName').textContent = name;
   document.getElementById('profileAvatar').textContent = (name[0]||'?').toUpperCase();
-  document.getElementById('profileWa').textContent = S.profile.wa ? formatPhone(S.profile.wa) : 'Complète ton profil →';
-  const mine = S.products.filter(p => S.user && p.uid === S.user.id);
-  document.getElementById('statProd').textContent = mine.length;
-  document.getElementById('statSales').textContent = S.profile.sales || 0;
+  document.getElementById('profileWa').textContent = S.profile.whatsapp ? formatPhone(S.profile.whatsapp) : 'Complète ton profil →';
+  const mine = S.products.filter(p => S.user && p.uid===S.user.id);
+  document.getElementById('statProd').textContent  = mine.length;
+  document.getElementById('statSales').textContent = S.profile.sales_count || 0;
   document.getElementById('statViews').textContent = mine.reduce((a,p) => a+(p.views||0), 0);
+
+  // Bannière profil incomplet
+  const wrap = document.getElementById('completeBannerWrap');
+  if (S.user && !isProfileComplete()) {
+    wrap.innerHTML = `
+      <div class="complete-banner">
+        <div class="complete-banner-icon">⚠️</div>
+        <div class="complete-banner-text">
+          <div class="complete-banner-title">Profil incomplet</div>
+          <div class="complete-banner-sub">Ajoute ton nom et WhatsApp pour pouvoir vendre.</div>
+        </div>
+        <button class="btn btn-gold btn-sm" onclick="openEditModal()">Compléter</button>
+      </div>`;
+  } else {
+    wrap.innerHTML = '';
+  }
   updateAuthUI();
 }
 
-function openEditModal() {
-  document.getElementById('editName').value = S.profile.name || '';
-  document.getElementById('editWa').value   = S.profile.wa   || '';
-  document.getElementById('editMc').value   = S.profile.mc   || '';
-  document.getElementById('editNc').value   = S.profile.nc   || '';
-  document.getElementById('editModal').classList.add('open');
+// ═══════════════════════════════════════════════════════════════
+// PUBLICATION PRODUIT
+// ═══════════════════════════════════════════════════════════════
+function pickEmoji(el) {
+  document.querySelectorAll('.emoji-opt').forEach(e => e.classList.remove('selected'));
+  el.classList.add('selected'); S.emoji = el.dataset.e;
 }
 
-function saveProfile() {
-  const name = document.getElementById('editName').value.trim();
-  const wa   = document.getElementById('editWa').value.trim();
-  if (!name) { toast('⚠️ Le nom ne peut pas être vide', 'error'); return; }
-  if (!wa)   { toast('⚠️ Le numéro WhatsApp est obligatoire', 'error'); return; }
-  S.profile.name = name;
-  S.profile.wa   = wa;
-  S.profile.mc   = document.getElementById('editMc').value.trim();
-  S.profile.nc   = document.getElementById('editNc').value.trim();
-  saveLocal(); closeModal('editModal'); renderProfile();
-  toast('✅ Profil mis à jour', 'success');
+async function publishProduct() {
+  if (!S.user) { toast('⚠️ Connecte-toi pour publier', 'error'); setTimeout(() => openAuthModal(), 600); return; }
+  if (!isProfileComplete()) { toast('⚠️ Configure d\'abord ton profil', 'error'); setTimeout(() => openEditModal(), 600); return; }
+
+  const name  = document.getElementById('sellName').value.trim();
+  const desc  = document.getElementById('sellDesc').value.trim();
+  const cat   = document.getElementById('sellCat').value;
+  const price = document.getElementById('sellPrice').value;
+  const phone = document.getElementById('sellPhone').value.trim() || S.profile.whatsapp;
+  const mc    = document.getElementById('sellMc').value.trim()    || S.profile.moncash;
+  const nc    = document.getElementById('sellNc').value.trim()    || S.profile.natcash;
+
+  if (!name||!desc||!cat||!price) { toast('⚠️ Remplis tous les champs obligatoires', 'error'); return; }
+  if (parseInt(price)<=0)         { toast('⚠️ Le prix doit être supérieur à 0 HTG', 'error');  return; }
+  if (!phone)                     { toast('⚠️ Saisis un numéro WhatsApp', 'error'); return; }
+
+  const btn = document.getElementById('publishBtn');
+  btn.disabled = true; btn.textContent = 'Publication…';
+
+  const { error } = await sb.from('products').insert([{
+    name, description: desc, category: cat,
+    emoji: S.emoji, seller_name: S.profile.name,
+    whatsapp: phone, moncash: mc, natcash: nc,
+    price: parseInt(price), views: 0, user_id: S.user.id, is_active: true,
+  }]);
+
+  btn.disabled = false; btn.textContent = 'Publier le produit';
+  if (error) { toast('❌ Erreur lors de la publication', 'error'); console.error(error); return; }
+
+  ['sellName','sellDesc','sellPrice','sellPhone','sellMc','sellNc'].forEach(id => { document.getElementById(id).value=''; });
+  document.getElementById('sellCat').value = '';
+  document.querySelectorAll('.emoji-opt').forEach((e,i) => e.classList.toggle('selected', i===0));
+  S.emoji = '📚';
+
+  toast('✅ Produit publié avec succès !', 'success');
+  await loadProducts();
+  setTimeout(() => navigate('my-products'), 800);
 }
 
 // ═══════════════════════════════════════════════════════════════
 // INIT
 // ═══════════════════════════════════════════════════════════════
+function setupRealtime() {
+  sb.channel('orders-rt')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'orders' },
+      async (payload) => {
+        if (!S.user) return;
+        const row = payload.new || payload.old || {};
+        if (row.buyer_id === S.user.id || row.seller_id === S.user.id) {
+          await loadMyOrders();
+          await loadReceivedOrders();
+          if (S.page === 'panier')      renderPanier();
+          if (S.page === 'my-products') renderReceivedOrders();
+          if (row.buyer_id === S.user.id && payload.eventType === 'UPDATE') {
+            if (payload.new?.status === 'confirmed') toast('✅ Commande confirmée par le vendeur !', 'success');
+            if (payload.new?.status === 'cancelled') toast('❌ Commande annulée par le vendeur', 'error');
+          }
+        }
+      }
+    ).subscribe();
+}
+
 updateCartBadge();
 renderProfile();
 loadProducts();
-
-if (!isProfileComplete()) {
-  setTimeout(() => toast('👋 Configure ton profil pour vendre'), 1400);
-}
+setupRealtime();
 </script>
 </body>
 </html>
